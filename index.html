@@ -11,13 +11,9 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
             user-select: none; color: #cfd6df;
         }
-        #main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100vw;
-            height: 100vh;
-            position: relative;
+        #canvas-container {
+            position: absolute; top: 50px; bottom: 0; left: 0; right: 0;
+            display: flex; justify-content: center; align-items: center;
         }
         #top-bar {
             position: absolute; top: 0; left: 0; right: 0;
@@ -32,7 +28,7 @@
         }
         #bio-inspect {
             position: absolute; top: 75px; left: 50%; transform: translateX(-50%);
-            background: rgba(12, 16, 24, 0.9); border: 2px solid #00a3ff;
+            background: rgba(12, 16, 24, 0.95); border: 2px solid #00a3ff;
             padding: 12px 25px; border-radius: 15px; font-size: 14px;
             display: none; max-width: 450px; text-align: center; z-index: 10; color: #fff;
         }
@@ -61,9 +57,9 @@
 
     <div id="bio-inspect">Часть клетки: <span id="bio-text" style="color:#00a3ff; font-weight:bold;">-</span></div>
 
-    <div id="main-container">
-        <!-- Задали жесткие размеры, чтобы сцена гарантированно отрисовалась -->
-        <svg id="svg-canvas" width="800" height="600" style="background:#0b0e14; overflow:visible;"></svg>
+    <div id="canvas-container">
+        <!-- Жестко заданный графический растровый буфер -->
+        <canvas id="main-canvas" width="800" height="600" style="background:#0b0e14; max-width:100%; max-height:100%;"></canvas>
     </div>
 
     <div id="layer-slider-container">
@@ -76,11 +72,12 @@
         <div class="legend-item"><div class="color-box" style="background:#00ff66;"></div><span>Мембрана (Оболочка)</span></div>
         <div class="legend-item"><div class="color-box" style="background:#ff3b30;"></div><span>Ядро</span></div>
         <div class="legend-item"><div class="color-box" style="background:#00a3ff;"></div><span>Вакуоли</span></div>
-        <div class="legend-item"><div class="color-box" style="background:#4a5568;"></div><span>Цитоплазма (Среда клетки)</span></div>
+        <div class="legend-item"><div class="color-box" style="background:#4a5568;"></div><span>Цитоплазма (Внутренняя среда)</span></div>
     </div>
 
     <script>
-        const svg = document.getElementById('svg-canvas');
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d');
         const slider = document.getElementById('layer-slider');
         const display = document.getElementById('layer-display');
         const bioInspect = document.getElementById('bio-inspect');
@@ -90,62 +87,64 @@
         const TOTAL_LAYERS = 60;
         let layersData = [];
 
+        // Математический расчет 3D-точек органоидов клетки
         function initData() {
+            layersData = [];
             for (let l = 0; l < TOTAL_LAYERS; l++) {
                 let h = (l - TOTAL_LAYERS/2) / (TOTAL_LAYERS/2);
                 if (Math.abs(h) >= 0.98) continue;
                 
-                let baseRadius = Math.sqrt(1 - h * h) * 140;
-                let layerY = h * 100;
+                let baseRadius = Math.sqrt(1 - h * h) * 130;
+                let layerY = h * 90;
 
                 let layer = { y: layerY, index: l, elements: [] };
 
-                // 1. Мембрана
+                // Оболочка (Мембрана)
                 let memPoints = [];
-                for (let i = 0; i <= 72; i++) {
-                    let a = (i / 72) * Math.PI * 2;
-                    let r = baseRadius + Math.sin(a * 5) * 8 * Math.cos(layerY*0.02);
+                for (let i = 0; i <= 60; i++) {
+                    let a = (i / 60) * Math.PI * 2;
+                    let r = baseRadius + Math.sin(a * 5) * 6;
                     memPoints.push({a: a, r: r});
                 }
-                layer.elements.push({ type: 'line', points: memPoints, color: '#00ff66', text: "КЛЕТОЧНАЯ МЕМБРАНА (Оболочка) — защищает клетку и отделяет цитоплазму от внешней среды." });
+                layer.elements.push({ type: 'line', points: memPoints, color: '#00ff66', lineWidth: 2.5, text: "КЛЕТОЧНАЯ МЕМБРАНА (Оболочка) — защищает клетку и отделяет цитоплазму от внешней среды." });
 
-                // 2. Ядро
-                let coreMax = 40;
+                // Ядро
+                let coreMax = 35;
                 let distToCore = Math.abs(layerY - 10);
                 if (distToCore < coreMax) {
                     let coreR = Math.sqrt(coreMax*coreMax - distToCore*distToCore);
                     let corePoints = [];
-                    for (let i = 0; i <= 40; i++) {
-                        let a = (i / 40) * Math.PI * 2;
+                    for (let i = 0; i <= 36; i++) {
+                        let a = (i / 36) * Math.PI * 2;
                         corePoints.push({a: a, r: coreR, cx: -20, cz: -10});
                     }
-                    layer.elements.push({ type: 'line', points: corePoints, color: '#ff3b30', text: "ЯДРО — главный центр, регулирует все процессы жизнедеятельности в цитоплазме." });
+                    layer.elements.push({ type: 'line', points: corePoints, color: '#ff3b30', lineWidth: 2.5, text: "ЯДРО — главный центр, регулирует все процессы жизнедеятельности в цитоплазме." });
                 }
 
-                // 3. Вакуоли
-                let vacs = [{x: 50, z: 30, r: 20}, {x: -40, z: 40, r: 16}];
+                // Вакуоли
+                let vacs = [{x: 45, z: 25, r: 18}, {x: -35, z: 35, r: 15}];
                 vacs.forEach(v => {
                     let distToVac = Math.abs(layerY);
                     if (distToVac < v.r) {
                         let vacR = Math.sqrt(v.r*v.r - distToVac*distToVac);
                         let vacPoints = [];
-                        for (let i = 0; i <= 30; i++) {
-                            let a = (i / 30) * Math.PI * 2;
+                        for (let i = 0; i <= 24; i++) {
+                            let a = (i / 24) * Math.PI * 2;
                             vacPoints.push({a: a, r: vacR, cx: v.x, cz: v.z});
                         }
-                        layer.elements.push({ type: 'line', points: vacPoints, color: '#00a3ff', text: "ВНУТРЕННЯЯ ВАКУОЛЬ — находится в цитоплазме, содержит запас воды и клеточного сока." });
+                        layer.elements.push({ type: 'line', points: vacPoints, color: '#00a3ff', lineWidth: 2, text: "ВНУТРЕННЯЯ ВАКУОЛЬ — находится в цитоплазме, содержит запас воды и клеточного сока." });
                     }
                 });
 
-                // 4. Цитоплазма (Внутренние линии)
+                // Цитоплазма (Внутренние линии)
                 let gridLines = [];
-                let space = 16;
+                let space = 18;
                 for (let x = -baseRadius; x <= baseRadius; x += space) {
                     for (let z = -baseRadius; z <= baseRadius; z += space) {
                         let d = Math.sqrt(x*x + z*z);
-                        if (d < baseRadius - 4) {
+                        if (d < baseRadius - 5) {
                             let dToCore = Math.sqrt((x+20)*(x+20) + (z+10)*(z+10));
-                            if (dToCore > 30 || distToCore >= coreMax) {
+                            if (dToCore > 25 || distToCore >= coreMax) {
                                 if (l % 2 === 0) {
                                     gridLines.push({x1: x, z1: z - space/2, x2: x, z2: z + space/2});
                                 } else {
@@ -163,42 +162,43 @@
             }
         }
 
+        // Проекция 3D точек на плоскость 2D экрана
         function project(x, y, z) {
             let cos = Math.cos(angleY);
             let sin = Math.sin(angleY);
             let rx = x * cos - z * sin;
             let rz = x * sin + z * cos;
             
-            // Центрируем внутри контейнера 800x600
-            let screenX = 400 + rx * 1.6;
-            let screenY = 300 + (rz * 0.4 - y * 1.3);
+            let screenX = 400 + rx * 1.8;
+            let screenY = 300 + (rz * 0.5 - y * 1.3);
             return { x: screenX, y: screenY };
         }
 
-        function render() {
-            svg.innerHTML = '';
+        let currentHoverText = "";
+
+        // Основная функция отрисовки кадра
+        function drawFrame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             let maxVisible = parseInt(slider.value);
             display.innerText = maxVisible + '/60';
+
+            let activeHoverText = "";
 
             layersData.forEach((layer, idx) => {
                 if (idx >= maxVisible) return;
 
                 layer.elements.forEach(el => {
                     if (el.type === 'line') {
-                        let dStr = '';
+                        ctx.beginPath();
                         el.points.forEach((p, pIdx) => {
                             let cx = p.cx || 0;
                             let cz = p.cz || 0;
                             let lx = cx + Math.cos(p.a) * p.r;
                             let lz = cz + Math.sin(p.a) * p.r;
                             let pt = project(lx, layer.y, lz);
-                            dStr += (pIdx === 0 ? 'M ' : 'L ') + pt.x + ' ' + pt.y;
+                            if (pIdx === 0) ctx.moveTo(pt.x, pt.y);
+                            else ctx.lineTo(pt.x, pt.y);
                         });
-
-                        let path = document.createElementNS("http://w3.org", "path");
-                        path.setAttribute("d", dStr);
-                        path.setAttribute("stroke", el.color);
-                        path.setAttribute("stroke-width", "2.5");
-                        path.setAttribute("fill", "none");
-                        
-                        path.addEventListener('mouseover', () => {
+                        ctx.strokeStyle = el.color;
+                        ctx.lineWidth = el.lineWidth;
+                        ctx.globalAlpha = 1.0;
