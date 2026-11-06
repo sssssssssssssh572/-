@@ -53,31 +53,36 @@
 <body>
 
     <div id="top-bar">
-        <div class="brand">Биология 5-7 класс: <span style="color:#fff; font-weight:normal;">Внутреннее строение клетки в разрезе слайсера</span></div>
+        <div class="brand">Биология 7 класс: <span style="color:#fff; font-weight:normal;">Внутреннее строение клетки</span></div>
         <div class="author-badge">РАЗРАБОТАЛ: Шамиль, ученик 7 класса</div>
     </div>
 
     <div id="bio-inspect">Часть клетки: <span id="bio-text" style="color:#00a3ff; font-weight:bold;">-</span></div>
 
     <div id="canvas-container">
-        <canvas id="main-canvas" width="800" height="600"></canvas>
+        <canvas id="main-canvas" width="800" height="600" style="background:#0b0e14; max-width:100%; max-height:100%;"></canvas>
     </div>
 
     <div id="layer-slider-container">
-        <input type="range" id="layer-slider" min="1" max="60" step="1" value="45">
-        <div class="layer-counter" id="layer-display">45/60</div>
+        <input type="range" id="layer-slider" min="1" max="60" step="1" value="60">
+        <div class="layer-counter" id="layer-display">60/60</div>
     </div>
 
     <div id="cura-panel">
-        <div class="panel-header">Компоненты (Слои послойно)</div>
+        <div class="panel-header">Слои клетки (Вид изнутри)</div>
         <div class="legend-item"><div class="color-box" style="background:#00ff66;"></div><span>Мембрана (Оболочка)</span></div>
-        <div class="legend-item"><div class="color-box" style="background:#ff3b30;"></div><span>Ядро с генетическим кодом</span></div>
-        <div class="legend-item"><div class="color-box" style="background:#00a3ff;"></div><span>Вакуоли с клеточным соком</span></div>
+        <div class="legend-item"><div class="color-box" style="background:#ff3b30;"></div><span>Ядро</span></div>
+        <div class="legend-item"><div class="color-box" style="background:#00a3ff;"></div><span>Вакуоли</span></div>
         <div class="legend-item"><div class="color-box" style="background:#4a5568;"></div><span>Цитоплазма (Внутренняя среда)</span></div>
-        <div class="hint">Удерживайте ЛКМ и двигайте мышь влево/вправо для вращения модели клетки. Наводите на структуры для их изучения.</div>
+        <div class="hint">Зажмите левую кнопку мыши на черном экране и ведите в стороны для вращения модели. Наведите на контуры для изучения органоидов.</div>
     </div>
 
     <script>
+        let mouseX = 0;
+        let mouseY = 0;
+        let isDragging = false;
+        let lastMouseX = 0;
+
         const canvas = document.getElementById('main-canvas');
         const ctx = canvas.getContext('2d');
         const slider = document.getElementById('layer-slider');
@@ -85,67 +90,47 @@
         const bioInspect = document.getElementById('bio-inspect');
         const bioText = document.getElementById('bio-text');
 
-        // Глобальные состояния интерактива
-        let angleY = 0.5; 
-        let mouseX = 0;
-        let mouseY = 0;
-        let isDragging = false;
-        let lastMouseX = 0;
-        let hoveredText = "";
-
+        let angleY = 0.5;
         const TOTAL_LAYERS = 60;
         let layersData = [];
 
-        // Генерация математической 3D-модели клетки (по слоям Z-слайсера)
         function initData() {
             layersData = [];
             for (let l = 0; l < TOTAL_LAYERS; l++) {
                 let h = (l - TOTAL_LAYERS/2) / (TOTAL_LAYERS/2);
                 if (Math.abs(h) >= 0.98) continue;
                 
-                let baseRadius = Math.sqrt(1 - h * h) * 150;
-                let layerY = h * 110;
+                let baseRadius = Math.sqrt(1 - h * h) * 140;
+                let layerY = h * 100;
 
                 let layer = { y: layerY, index: l, elements: [] };
 
-                // 1. Оболочка (Мембрана) с легкой биологической волнистостью
+                // Оболочка (Мембрана)
                 let memPoints = [];
                 for (let i = 0; i <= 60; i++) {
                     let a = (i / 60) * Math.PI * 2;
-                    let r = baseRadius + Math.sin(a * 6) * 4;
+                    let r = baseRadius + Math.sin(a * 5) * 5;
                     memPoints.push({a: a, r: r, cx: 0, cz: 0});
                 }
-                layer.elements.push({ 
-                    type: 'line', 
-                    points: memPoints, 
-                    color: '#00ff66', 
-                    lineWidth: 2.5, 
-                    text: "КЛЕТОЧНАЯ МЕМБРАНА (Оболочка) — защищает внутреннее содержимое клетки от внешних воздействий и осуществляет транспорт веществ." 
-                });
+                layer.elements.push({ type: 'line', points: memPoints, color: '#00ff66', lineWidth: 2.5, text: "КЛЕТОЧНАЯ МЕМБРАНА (Оболочка) — защищает клетку и отделяет цитоплазму от внешней среды." });
 
-                // 2. Клеточное Ядро
-                let coreMax = 40;
-                let distToCore = Math.abs(layerY - 15);
+                // Ядро
+                let coreMax = 38;
+                let distToCore = Math.abs(layerY - 12);
                 if (distToCore < coreMax) {
                     let coreR = Math.sqrt(coreMax*coreMax - distToCore*distToCore);
                     let corePoints = [];
                     for (let i = 0; i <= 36; i++) {
                         let a = (i / 36) * Math.PI * 2;
-                        corePoints.push({a: a, r: coreR, cx: -25, cz: -15});
+                        corePoints.push({a: a, r: coreR, cx: -20, cz: -10});
                     }
-                    layer.elements.push({ 
-                        type: 'line', 
-                        points: corePoints, 
-                        color: '#ff3b30', 
-                        lineWidth: 3, 
-                        text: "ЯДРО — важнейший органоид клетки. Хранит наследственную информацию (ДНК) и координирует все процессы метаболизма." 
-                    });
+                    layer.elements.push({ type: 'line', points: corePoints, color: '#ff3b30', lineWidth: 2.5, text: "ЯДРО — главный центр, регулирует все процессы жизнедеятельности в цитоплазме." });
                 }
 
-                // 3. Вакуоли растительного типа
-                let vacs = [{x: 50, z: 30, r: 25}, {x: -40, z: 45, r: 20}];
+                // Вакуоли
+                let vacs = [{x: 45, z: 25, r: 20}, {x: -35, z: 35, r: 16}];
                 vacs.forEach(v => {
-                    let distToVac = Math.abs(layerY - 5);
+                    let distToVac = Math.abs(layerY);
                     if (distToVac < v.r) {
                         let vacR = Math.sqrt(v.r*v.r - distToVac*distToVac);
                         let vacPoints = [];
@@ -153,27 +138,19 @@
                             let a = (i / 24) * Math.PI * 2;
                             vacPoints.push({a: a, r: vacR, cx: v.x, cz: v.z});
                         }
-                        layer.elements.push({ 
-                            type: 'line', 
-                            points: vacPoints, 
-                            color: '#00a3ff', 
-                            lineWidth: 2, 
-                            text: "ВАКУОЛЬ — полость в цитоплазме, заполненная клеточным соком. Регулирует тургорное давление и хранит питательные вещества." 
-                        });
+                        layer.elements.push({ type: 'line', points: vacPoints, color: '#00a3ff', lineWidth: 2, text: "ВНУТРЕННЯЯ ВАКУОЛЬ — находится в цитоплазме, содержит запас воды и клеточного сока." });
                     }
                 });
 
-                // 4. Структурированная Цитоплазма (Штриховка сетки слайсера внутри мембраны)
+                // Цитоплазма
                 let gridLines = [];
-                let space = 20;
+                let space = 18;
                 for (let x = -baseRadius; x <= baseRadius; x += space) {
                     for (let z = -baseRadius; z <= baseRadius; z += space) {
                         let d = Math.sqrt(x*x + z*z);
-                        if (d < baseRadius - 6) {
-                            // Исключаем попадание сетки внутрь структуры ядра
-                            let dToCore = Math.sqrt((x+25)*(x+25) + (z+15)*(z+15));
+                        if (d < baseRadius - 5) {
+                            let dToCore = Math.sqrt((x+20)*(x+20) + (z+10)*(z+10));
                             let inCore = distToCore < coreMax && dToCore < Math.sqrt(coreMax*coreMax - distToCore*distToCore);
-                            
                             if (!inCore) {
                                 if (l % 2 === 0) {
                                     gridLines.push({x1: x, z1: z - space/2, x2: x, z2: z + space/2});
@@ -185,16 +162,41 @@
                     }
                 }
                 if (gridLines.length > 0) {
-                    layer.elements.push({ 
-                        type: 'grid', 
-                        lines: gridLines, 
-                        color: 'rgba(74, 85, 104, 0.4)', 
-                        text: "ЦИТОПЛАЗМА — вязкое полужидкое вещество, заполняющее клетку. В ней протекают все химические реакции и располагаются органоиды." 
-                    });
+                    layer.elements.push({ type: 'grid', lines: gridLines, color: '#4a5568', text: "ЦИТОПЛАЗМА — основное вязкое полужидкое вещество, связывающее все части клетки воедино." });
                 }
 
                 layersData.push(layer);
             }
         }
 
-        // Проекция 3D точки (X, Y, Z) на 2D экран с учетом угла поворота AngleY
+        function project(x, y, z) {
+            let cos = Math.cos(angleY);
+            let sin = Math.sin(angleY);
+            let rotX = x * cos - z * sin;
+            let rotZ = x * sin + z * cos;
+            
+            let screenX = canvas.width / 2 + rotX;
+            let screenY = canvas.height / 2 + y - rotZ * 0.4; 
+            return { x: screenX, y: screenY };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const maxVisibleLayer = parseInt(slider.value);
+            display.innerText = `${maxVisibleLayer}/${TOTAL_LAYERS}`;
+            
+            let currentHover = "";
+            let minDistance = 15;
+
+            layersData.forEach(layer => {
+                if (layer.index > maxVisibleLayer) return;
+                const isTopLayer = (layer.index === maxVisibleLayer);
+
+                layer.elements.forEach(elem => {
+                    ctx.beginPath();
+                    
+                    if (elem.type === 'line') {
+                        ctx.lineWidth = elem.lineWidth;
+                        ctx.strokeStyle = isTopLayer ? elem.color : elem.color + "22";
+                        
