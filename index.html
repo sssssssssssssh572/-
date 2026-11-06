@@ -35,11 +35,44 @@
         }
         #layer-slider-container {
             position: absolute; right: 330px; top: 110px; bottom: 110px;
-            width: 35px; display: flex; flex-direction: column; align-items: center;
-            background: rgba(24, 29, 40, 0.8); border-radius: 6px; padding: 15px 0; border: 1px solid #283146; z-index: 10;
+            width: 45px; display: flex; flex-direction: column; align-items: center;
+            background: rgba(24, 29, 40, 0.8); border-radius: 6px; padding: 20px 5px; border: 1px solid #283146; z-index: 10;
         }
-        input[type="range"] { writing-mode: bt-lr; appearance: slider-vertical; width: 6px; height: 100%; background: #283146; cursor: pointer; }
-        .layer-counter { font-size: 11px; color: #8892b0; margin-top: 8px; font-family: monospace; }
+        /* Кроссбраузерный вертикальный слайсер */
+        input[type="range"] { 
+            -webkit-appearance: none;
+            appearance: none;
+            width: 8px; 
+            height: 100%; 
+            background: #283146; 
+            cursor: pointer;
+            border-radius: 4px;
+            outline: none;
+            writing-mode: vertical-lr; /* Для поддержки старых стандартов */
+            direction: rtl;            /* Направление снизу вверх */
+        }
+        /* Стилизация ползунка для Chrome/Safari */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00a3ff;
+            box-shadow: 0 0 10px #00a3ff;
+            cursor: pointer;
+        }
+        /* Стилизация ползунка для Firefox */
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00a3ff;
+            box-shadow: 0 0 10px #00a3ff;
+            cursor: pointer;
+            border: none;
+        }
+        .layer-counter { font-size: 12px; color: #00ffaa; margin-top: 12px; font-family: monospace; font-weight: bold; }
         #cura-panel {
             position: absolute; top: 75px; right: 20px;
             background: rgba(24, 29, 40, 0.95); border: 1px solid #283146; padding: 20px; border-radius: 6px; width: 280px; z-index: 10;
@@ -64,6 +97,7 @@
     </div>
 
     <div id="layer-slider-container">
+        <!-- По умолчанию ставим максимальное значение 60, чтобы клетка сразу была видна при загрузке страницы -->
         <input type="range" id="layer-slider" min="1" max="60" step="1" value="60">
         <div class="layer-counter" id="layer-display">60/60</div>
     </div>
@@ -170,33 +204,3 @@
         }
 
         function project(x, y, z) {
-            let cos = Math.cos(angleY);
-            let sin = Math.sin(angleY);
-            let rotX = x * cos - z * sin;
-            let rotZ = x * sin + z * cos;
-            
-            let screenX = canvas.width / 2 + rotX;
-            let screenY = canvas.height / 2 + y - rotZ * 0.4; 
-            return { x: screenX, y: screenY };
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const maxVisibleLayer = parseInt(slider.value);
-            display.innerText = `${maxVisibleLayer}/${TOTAL_LAYERS}`;
-            
-            let currentHover = "";
-            let minDistance = 15;
-
-            layersData.forEach(layer => {
-                if (layer.index > maxVisibleLayer) return;
-                const isTopLayer = (layer.index === maxVisibleLayer);
-
-                layer.elements.forEach(elem => {
-                    ctx.beginPath();
-                    
-                    if (elem.type === 'line') {
-                        ctx.lineWidth = elem.lineWidth;
-                        ctx.strokeStyle = isTopLayer ? elem.color : elem.color + "22";
-                        
