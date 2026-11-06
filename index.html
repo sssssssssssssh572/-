@@ -12,206 +12,177 @@
             user-select: none; color: #cfd6df;
         }
         #canvas-container { width: 100vw; height: 100vh; }
-        
-        /* Верхняя панель с твоим авторством */
         #top-bar {
             position: absolute; top: 0; left: 0; right: 0;
-            height: 50px; background: #181d28;
-            border-bottom: 2px solid #00a3ff;
+            height: 50px; background: #181d28; border-bottom: 2px solid #00a3ff;
             display: flex; align-items: center; padding: 0 20px;
-            justify-content: space-between; font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 10;
+            justify-content: space-between; font-size: 14px; z-index: 10;
         }
         .brand { font-weight: bold; color: #00a3ff; }
         .author-badge { 
             background: #283146; padding: 6px 12px; border-radius: 20px; 
-            font-size: 12px; color: #00ffaa; font-weight: bold;
-            border: 1px solid #00ffaa;
-            box-shadow: 0 0 10px rgba(0,255,170,0.2);
+            font-size: 12px; color: #00ffaa; font-weight: bold; border: 1px solid #00ffaa;
         }
-
-        /* Кнопки управления слева */
         #left-toolbar {
             position: absolute; top: 75px; left: 20px;
             background: #181d28; border: 1px solid #283146;
-            border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 10px;
-            z-index: 10;
+            border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 10px; z-index: 10;
         }
         .tool-btn {
             background: #222938; border: 1px solid #343f55; color: #fff;
             padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;
-            text-align: center; transition: all 0.2s; font-weight: 600;
+            text-align: center; font-weight: 600;
         }
-        .tool-btn:hover { background: #00a3ff; border-color: #00a3ff; }
-        .tool-btn.active { background: #00a3ff; box-shadow: 0 0 10px rgba(0,163,255,0.5); }
-
-        /* Всплывающая подсказка с понятным описанием для 7 класса */
+        .tool-btn.active { background: #00a3ff; }
         #bio-inspect {
             position: absolute; top: 75px; left: 50%; transform: translateX(-50%);
             background: rgba(12, 16, 24, 0.9); border: 2px solid #00a3ff;
             padding: 12px 25px; border-radius: 15px; font-size: 14px;
-            box-shadow: 0 0 20px rgba(0,163,255,0.4); display: none; pointer-events: none;
-            max-width: 450px; text-align: center; line-height: 1.5; color: #ffffff;
-            z-index: 10; backdrop-filter: blur(5px);
+            display: none; max-width: 450px; text-align: center; z-index: 10;
         }
-
-        /* Вертикальный ползунок слоев (как в Cura) */
         #layer-slider-container {
             position: absolute; right: 330px; top: 110px; bottom: 180px;
             width: 35px; display: flex; flex-direction: column; align-items: center;
-            background: rgba(24, 29, 40, 0.8); border-radius: 6px; padding: 15px 0;
-            border: 1px solid #283146; z-index: 10;
+            background: rgba(24, 29, 40, 0.8); border-radius: 6px; padding: 15px 0; border: 1px solid #283146; z-index: 10;
         }
-        input[type="range"] {
-            appearance: slider-vertical; width: 6px; height: 100%;
-            background: #283146; outline: none; cursor: pointer;
-        }
+        input[type="range"] { appearance: slider-vertical; width: 6px; height: 100%; background: #283146; cursor: pointer; }
         .layer-counter { font-size: 11px; color: #8892b0; margin-top: 8px; font-family: monospace; }
-
-        /* Правая панель — Легенда цветов */
         #cura-panel {
             position: absolute; top: 75px; right: 20px;
-            background: rgba(24, 29, 40, 0.95); backdrop-filter: blur(10px);
-            border: 1px solid #283146; padding: 20px; border-radius: 6px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 280px; z-index: 10;
+            background: rgba(24, 29, 40, 0.95); border: 1px solid #283146; padding: 20px; border-radius: 6px; width: 280px; z-index: 10;
         }
-        .panel-header {
-            font-size: 12px; font-weight: bold; text-transform: uppercase;
-            letter-spacing: 1px; color: #00a3ff; margin-bottom: 12px;
-            border-bottom: 1px solid #283146; padding-bottom: 6px;
-        }
+        .panel-header { font-size: 12px; font-weight: bold; text-transform: uppercase; color: #00a3ff; margin-bottom: 12px; border-bottom: 1px solid #283146; padding-bottom: 6px; }
         .legend-item { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
         .color-box { width: 14px; height: 14px; border-radius: 3px; margin-right: 10px; }
-
-        /* Нижняя панель — Симулятор принтера */
         #slice-footer {
-            position: absolute; bottom: 20px; right: 20px;
-            background: #181d28; border: 1px solid #283146;
-            border-radius: 6px; padding: 15px; width: 280px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 10;
+            position: absolute; bottom: 20px; right: 20px; background: #181d28; border: 1px solid #283146; border-radius: 6px; padding: 15px; width: 280px; z-index: 10;
         }
         .stats-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
         .stats-val { font-weight: bold; color: #fff; }
-        .print-btn {
-            width: 100%; background: #00a3ff; border: none; color: white;
-            padding: 10px; border-radius: 4px; font-weight: bold; font-size: 13px;
-            cursor: pointer; margin-top: 10px; transition: background 0.2s;
-        }
-        .print-btn:hover { background: #0082cc; }
+        .print-btn { width: 100%; background: #00a3ff; border: none; color: white; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
-    <!-- Подключаем 3D движок Three.js -->
-    <script src="https://cloudflare.com"></script>
-    <script src="https://jsdelivr.net"></script>
+    <!-- ВСТРОЕННЫЙ СВЕРХНАДЕЖНЫЙ ДВИЖОК ДЛЯ 2D-ЛИНИЙ БЕЗ ВНЕШНИХ БИБЛИОТЕК -->
 </head>
 <body>
 
-    <!-- Название проекта и твое авторство -->
     <div id="top-bar">
         <div class="brand">Биология 7 класс: <span style="color:#fff; font-weight:normal;">Интерактивный 3D-слайсер клетки</span></div>
-        <!-- ТУТ ТВОЕ ИМЯ: Можешь дописать фамилию прямо внутри тега ниже -->
         <div class="author-badge">РАЗРАБОТАЛ: Шамиль, ученик 7 класса</div>
     </div>
 
-    <!-- Кнопки управления -->
     <div id="left-toolbar">
         <button class="tool-btn active" id="btn-rotate">Вращение</button>
         <button class="tool-btn" id="btn-play">Печать слоев</button>
     </div>
 
-    <!-- Подсказки при наведении на части клетки -->
     <div id="bio-inspect">Часть клетки: <span id="bio-text" style="color:#00a3ff; font-weight:bold;">-</span></div>
 
-    <div id="canvas-container"></div>
-
-    <!-- Ползунок как в Cura -->
-    <div id="layer-slider-container">
-        <input type="range" id="layer-slider" min="1" max="100" step="1" value="100">
-        <div class="layer-counter" id="layer-display">100/100</div>
+    <div id="canvas-container">
+        <!-- Автономный SVG холст, который заменяет Three.js и работает без интернета -->
+        <svg id="svg-canvas" style="width:100%; height:100%; background:#0b0e14;"></svg>
     </div>
 
-    <!-- Легенда органоидов -->
+    <div id="layer-slider-container">
+        <input type="range" id="layer-slider" min="1" max="60" step="1" value="60">
+        <div class="layer-counter" id="layer-display">60/60</div>
+    </div>
+
     <div id="cura-panel">
         <div class="panel-header">Слои G-Code (Строение клетки)</div>
         <div class="legend-item"><div class="color-box" style="background:#00ff66;"></div><span>Мембрана (Оболочка)</span></div>
         <div class="legend-item"><div class="color-box" style="background:#ff3b30;"></div><span>Ядро</span></div>
         <div class="legend-item"><div class="color-box" style="background:#00a3ff;"></div><span>Вакуоли</span></div>
         <div class="legend-item"><div class="color-box" style="background:#4a5568;"></div><span>Цитоплазма (Внутренняя сетка)</span></div>
-        <div style="margin-top: 15px; font-size: 11px; color: #718096; line-height: 1.4;">
-    <script src="https://jsdelivr.net"></script>
-<script src="https://jsdelivr.net"></script>
-
-
-
     </div>
 
-    <!-- Время и вес виртуальной печати клетки -->
     <div id="slice-footer">
         <div class="stats-row"><span>Имя файла:</span><span class="stats-val" style="color:#00ffaa;">Cytoplasm_7Grade.gcode</span></div>
         <div class="stats-row"><span>Время печати:</span><span class="stats-val" id="stat-time">2h 15m</span></div>
-        <div class="stats-row"><span>Расход био-пластика:</span><span class="stats-val" id="stat-weight">31.40 г</span></div>
-        <button class="print-btn" onclick="alert('Модель отправлена на печать! Твоя 3D-клетка создается слой за слоем.')">Запустить био-печать</button>
+        <div class="stats-row"><span>Расход пластика:</span><span class="stats-val" id="stat-weight">31.40 г</span></div>
+        <button class="print-btn" onclick="alert('Модель отправлена на принтер!')">Запустить био-печать</button>
     </div>
 
     <script>
-        // --- 1. Настройка 3D графики ---
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b0e14);
+        const svg = document.getElementById('svg-canvas');
+        const slider = document.getElementById('layer-slider');
+        const display = document.getElementById('layer-display');
+        const timeStat = document.getElementById('stat-time');
+        const weightStat = document.getElementById('stat-weight');
+        const bioInspect = document.getElementById('bio-inspect');
+        const bioText = document.getElementById('bio-text');
 
-        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(4, 5, 7);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-
-        // Стол принтера (Сетка)
-        const grid = new THREE.GridHelper(6, 20, 0x283146, 0x181d28);
-        grid.position.y = -1.6;
-        scene.add(grid);
-
-        const cellGroup = new THREE.Group();
-        scene.add(cellGroup);
-
-        const TOTAL_LAYERS = 100;
-        const minY = -1.4, maxY = 1.4;
-        const stepY = (maxY - minY) / TOTAL_LAYERS;
-        
-        let layerObjects = [];
-        let raycastTargets = [];
+        let angleY = 0;
         let autoRotate = true;
         let isPlaying = false;
         let playInterval = null;
 
-        // Функция шума для неровности живой клетки
-        function getBioNoise(angle, y, freq, amp) {
-            return Math.sin(angle * freq + y * 2) * Math.cos(angle * 2 - y) * amp;
-        }
+        // Генерация путей
+        const TOTAL_LAYERS = 60;
+        let layersData = [];
 
-        // Функция создания путей линий G-Code
-        function createGCodePath(points, color, opacity = 1, infoText = "") {
-            const geo = new THREE.BufferGeometry().setFromPoints(points);
-            const mat = new THREE.LineBasicMaterial({ 
-                color: color, transparent: opacity < 1, opacity: opacity, linewidth: 2 
-            });
-            const line = new THREE.Line(geo, mat);
-            line.userData = { structure: infoText }; 
-            return line;
-        }
-
-        // --- 2. ГЕНЕРАТОР СЛОЕВ КЛЕТКИ (Программа 5-7 класса) ---
-        function generateCellLayers() {
+        function initData() {
             for (let l = 0; l < TOTAL_LAYERS; l++) {
-                const currentY = minY + l * stepY;
-                const layerGroup = new THREE.Group();
-                const segments = 90;
+                let h = (l - TOTAL_LAYERS/2) / (TOTAL_LAYERS/2);
+                if (Math.abs(h) >= 0.98) continue;
+                
+                let baseRadius = Math.sqrt(1 - h * h) * 150;
+                let layerY = h * 120;
 
-                const h = currentY / 1.4;
-                if (Math.abs(h) >= 1.0) continue;
+                let layer = { y: layerY, index: l, elements: [] };
 
+                // 1. Мембрана
+                let memPoints = [];
+                for (let i = 0; i <= 72; i++) {
+                    let a = (i / 72) * Math.PI * 2;
+                    let r = baseRadius + Math.sin(a * 5) * 8 * Math.cos(layerY*0.02);
+                    memPoints.push({a: a, r: r, type: 'membrane'});
+                }
+                layer.elements.push({ type: 'line', points: memPoints, color: '#00ff66', text: "КЛЕТОЧНАЯ МЕМБРАНА (Оболочка) — защищает клетку и регулирует обмен веществ." });
+
+                // 2. Ядро
+                let coreMax = 45;
+                let distToCore = Math.abs(layerY - 10);
+                if (distToCore < coreMax) {
+                    let coreR = Math.sqrt(coreMax*coreMax - distToCore*distToCore);
+                    let corePoints = [];
+                    for (let i = 0; i <= 40; i++) {
+                        let a = (i / 40) * Math.PI * 2;
+                        corePoints.push({a: a, r: coreR, cx: -20, cz: -10, type: 'nucleus'});
+                    }
+                    layer.elements.push({ type: 'line', points: corePoints, color: '#ff3b30', text: "ЯДРО — главный центр управления клеткой, хранит наследственную информацию (ДНК)." });
+                }
+
+                // 3. Вакуоли
+                let vacs = [{x: 60, z: 40, r: 22}, {x: -50, z: 50, r: 18}];
+                vacs.forEach(v => {
+                    let distToVac = Math.abs(layerY);
+                    if (distToVac < v.r) {
+                        let vacR = Math.sqrt(v.r*v.r - distToVac*distToVac);
+                        let vacPoints = [];
+                        for (let i = 0; i <= 30; i++) {
+                            let a = (i / 30) * Math.PI * 2;
+                            vacPoints.push({a: a, r: vacR, cx: v.x, cz: v.z, type: 'vacuole'});
+                        }
+                        layer.elements.push({ type: 'line', points: vacPoints, color: '#00a3ff', text: "ВАКУОЛЬ — полость с клеточным соком, где запасаются питательные вещества." });
+                    }
+                });
+
+                // 4. Цитоплазма (Сетка инфилла)
+                let gridLines = [];
+                let space = 18;
+                for (let x = -baseRadius; x <= baseRadius; x += space) {
+                    for (let z = -baseRadius; z <= baseRadius; z += space) {
+                        let d = Math.sqrt(x*x + z*z);
+                        if (d < baseRadius - 5) {
+                            let dToCore = Math.sqrt((x+20)*(x+20) + (z+10)*(z+10));
+                            if (dToCore > 35 || distToCore >= coreMax) {
+                                if (l % 2 === 0) {
+                                    gridLines.push({x1: x, z1: z - space/2, x2: x, z2: z + space/2});
+                                } else {
+                                    gridLines.push({x1: x - space/2, z1: z, x2: x + space/2, z2: z});
+                                }
+                            }
+                        }
+                    }
+                }
+                if (gridLines.length > 0) {
